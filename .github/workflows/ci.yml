@@ -1,0 +1,50 @@
+name: Run test
+
+on:
+  pull_request:
+    branches: [main, develop]
+jobs:
+  #Job 1 : Tests unitaires
+  build:
+    runs-on: ubuntu-latest #Vm isolée
+
+    steps:
+      - uses: actions/checkout@v4 #extraction du code
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4 #v4 ==> numero de vesion de l'action
+        with:
+          distribution: 'temurin' #Distribution open source
+          java-version: 21
+          cache: 'gradle'
+
+      #Donner les droits au fichier gradlew de s'executer
+      - name: Grant execute permissions for gradlew
+        run: chmod +x gradlew #Commande shell
+
+      - name: Run unit test
+        run: ./gradlew clean testDebugUnitTest
+
+  #Job 2 : Lint - analyse statique du code (qualité, conventions, sécurité)
+  #On refait le stup pour que chaque Job marche sur sa propre machine isolée
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          cache: 'gradle'
+
+      - name: Grant execute permissions for gradlew
+        run: chmod +x gradlew #Commande shell
+
+      - name: Run lint
+        run: ./gradlew lint
+
+
+
+#On utilise need pour qu'une étape se déclenche seulement si un étape précédente souhaitée passe.
