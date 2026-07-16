@@ -28,7 +28,7 @@ jobs:
   #Job 2 : Lint - analyse statique du code (qualité, conventions, sécurité)
   #On refait le stup pour que chaque Job marche sur sa propre machine isolée
   lint:
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
