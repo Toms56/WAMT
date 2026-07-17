@@ -9,8 +9,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.wamt.data.WamtDatabase;
 import com.wamt.databinding.ActivityMainBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
@@ -18,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //A supprimer pour ne pas vider la base de données à chaque lancement de l'application
+        WamtDatabase db = WamtDatabase.getDatabase(getApplicationContext());
+        new Thread(db::clearAllTables).start();
+
         EdgeToEdge.enable(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
