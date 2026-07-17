@@ -1,17 +1,22 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.example.wamt"
+    namespace = "com.wamt"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
         }
     }
 
+    buildFeatures{
+        viewBinding = true
+    }
+
     defaultConfig {
-        applicationId = "com.example.wamt"
+        applicationId = "com.wamt"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -55,5 +60,8 @@ dependencies {
     annotationProcessor(libs.room.compiler)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.viewmodel)
+    androidTestImplementation(libs.androidx.core.testing)
+    implementation(libs.hilt)
+    annotationProcessor(libs.hilt.compiler)
 
 }
