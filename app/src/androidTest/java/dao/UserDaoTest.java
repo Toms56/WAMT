@@ -25,6 +25,8 @@ import testUtil.LiveDataTestUtil;
 @RunWith(AndroidJUnit4.class)
 public class UserDaoTest {
 
+    private static final String TEST_PSEUDO = "Test1";
+
     private WamtDatabase database;
 
     @Rule
@@ -33,22 +35,20 @@ public class UserDaoTest {
     @Before
     public void createDb(){
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
-                WamtDatabase.class)
+                        WamtDatabase.class)
                 .allowMainThreadQueries()
                 .build();
     }
-
 
     @After
     public void closeDb(){
         database.close();
     }
 
-
     @Test
     public void testShouldInsertUserIntoDatabaseSuccessfully() throws InterruptedException{
         // Given
-        UserEntity user = new UserEntity("Test1");
+        UserEntity user = new UserEntity(TEST_PSEUDO);
 
         // When
         database.userDao().insertUser(user);
@@ -59,13 +59,13 @@ public class UserDaoTest {
                         database.userDao().getUserById(1)
                 );
 
-        assertEquals("Test1", insertedUser.getPseudo());
+        assertEquals(TEST_PSEUDO, insertedUser.getPseudo());
     }
 
     @Test
     public void testShouldReturnOneWhenExistingOneUserInDatabase() throws InterruptedException{
         // Given
-        UserEntity user = new UserEntity("Test1");
+        UserEntity user = new UserEntity(TEST_PSEUDO);
         database.userDao().insertUser(user);
 
         //When
