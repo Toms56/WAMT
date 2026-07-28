@@ -37,7 +37,7 @@ jobs:
             fetch-depth: 0 #SonarQube a besoin de l'historique complet du projet pour analyser les changements
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703 # v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
