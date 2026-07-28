@@ -63,5 +63,6 @@ dependencies {
     androidTestImplementation(libs.androidx.core.testing)
     implementation(libs.hilt)
     annotationProcessor(libs.hilt.compiler)
+    implementation(libs.flexbox)
 
 }

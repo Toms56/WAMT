@@ -8,6 +8,11 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.flexbox.AlignItems;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.wamt.R;
 import com.wamt.data.model.User;
 import com.wamt.databinding.FragmentMainPageBinding;
@@ -30,12 +35,6 @@ public class UserListFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        binding.createUserButton.setEnabled(true);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
@@ -52,26 +51,29 @@ public class UserListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(requireContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setFlexWrap(FlexWrap.WRAP);
+        layoutManager.setJustifyContent(JustifyContent.CENTER);
+        layoutManager.setAlignItems(AlignItems.CENTER);
+
 
         // requireActivity() : même instance que celle utilisée dans
         // CreateUserFragment, pour que les deux fragments partagent le même UserViewModel
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
         userAdapter = new UserAdapter(); //Sera rempli au fur et a mesure que Room donnera des users à afficher
-        binding.userPseudoRecyclerView.setLayoutManager(
-                new androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-        );
+        binding.userPseudoRecyclerView.setLayoutManager(layoutManager);
         binding.userPseudoRecyclerView.setAdapter(userAdapter); //Association de l'adapter au RecyclerView
 
-        binding.createUserButton.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_main_page, CreateUserFragment.newInstance())
-                    .addToBackStack(null) //Revenir sur le fragment précédent plutôt que fermer l'app
-                    .commit();
-        });
+        binding.createUserButton.setOnClickListener(v -> requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_main_page, CreateUserFragment.newInstance())
+                .addToBackStack(null) //Revenir sur le fragment précédent plutôt que fermer l'app
+                .commit());
 
         userViewModel.getAllUsers().observe(getViewLifecycleOwner(), this::updateUi);
+        userViewModel.getUserCount().observe(getViewLifecycleOwner(), this::updateCreateUserButtonState);
     }
 
     private void updateUi(List<User> users){
@@ -83,6 +85,14 @@ public class UserListFragment extends Fragment {
         binding.userPseudoRecyclerView.setVisibility(View.VISIBLE);
         userAdapter.setUsers(users);
 
+    }
+
+    private void updateCreateUserButtonState(Integer userCount) {
+        if (userCount != null && userCount < 6) {
+            binding.createUserButton.setEnabled(true);
+        } else {
+            binding.createUserButton.setEnabled(false);
+        }
     }
 
     @Override
