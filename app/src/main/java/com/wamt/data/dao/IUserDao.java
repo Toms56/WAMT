@@ -29,4 +29,7 @@ SELECT * FROM user
 
     @Delete
     void deleteUser(UserEntity user);
+
+    @Query("SELECT COUNT(*) FROM user")
+    LiveData<Integer> getUserCount();
 }

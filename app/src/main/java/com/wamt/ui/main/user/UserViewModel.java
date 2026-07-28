@@ -20,11 +20,13 @@ public class UserViewModel extends ViewModel {
     // Liste des utilisateurs, mise à jour automatiquement par Room
     // dès qu'une donnée change en base (LiveData observée en continu)
     private final LiveData<List<User>> allUsers;
+    private final LiveData<Integer> userCount;
 
 
     @Inject
     public UserViewModel(UserRepository repository){
         this.userRepository = repository;
+        this.userCount = repository.getUserCount();
         this.allUsers = userRepository.getAllUsers();
     }
 
@@ -39,6 +41,10 @@ public class UserViewModel extends ViewModel {
 
     public void insertUser(User user) {
         userRepository.insertUser(user);
+    }
+
+    public LiveData<Integer> getUserCount() {
+        return userCount;
     }
 
     public void deleteUser(User user) {

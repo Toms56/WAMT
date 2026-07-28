@@ -40,4 +40,8 @@ public class UserRepository {
     public void deleteUser(User user) {
         executorService.execute(() -> userDao.deleteUser(UserMapper.toEntity(user)));
     }
+
+    public LiveData<Integer> getUserCount() {
+        return userDao.getUserCount();
+    }
 }

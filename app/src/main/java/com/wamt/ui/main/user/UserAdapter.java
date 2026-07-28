@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.flexbox.FlexboxLayoutManager;
 import com.wamt.R;
 import com.wamt.data.model.User;
 
@@ -101,6 +102,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         // Affiche le pseudo dans la ligne
         holder.pseudoTextView.setText(user.getPseudo());
+
+        // Force chaque item à occuper 1/3 de la largeur du RecyclerView
+        ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+        if (lp instanceof FlexboxLayoutManager.LayoutParams) {
+            FlexboxLayoutManager.LayoutParams flexParams = (FlexboxLayoutManager.LayoutParams) lp;
+            flexParams.setFlexBasisPercent(0.33f);
+            holder.itemView.setLayoutParams(flexParams);
+        }
     }
 
 

@@ -63,6 +63,18 @@ public class UserDaoTest {
     }
 
     @Test
+    public void testShouldReturnOneWhenExistingOneUserInDatabase() throws InterruptedException{
+        // Given
+        UserEntity user = new UserEntity("Test1");
+        database.userDao().insertUser(user);
+
+        //When
+        Integer userCount = LiveDataTestUtil.getOrAwaitValue(database.userDao().getUserCount());
+        // Then
+        assertEquals("User count must be 1", Integer.valueOf(1), userCount);
+    }
+
+    @Test
     public void testGetAllUsersShouldReturnEmptyList()
             throws InterruptedException {
 
