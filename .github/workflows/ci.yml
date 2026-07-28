@@ -1,6 +1,8 @@
 name: Run test
 
 on:
+  push:
+    branches: [main, develop]
   pull_request:
     branches: [main, develop]
 jobs:
@@ -24,6 +26,20 @@ jobs:
 
       - name: Run unit test
         run: ./gradlew clean testDebugUnitTest
+
+  #Job 2 : Scan sonar
+  build-sonar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0 #SonarQube a besoin de l'historique complet du projet pour analyser les changements
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   #Job 2 : Lint - analyse statique du code (qualité, conventions, sécurité)
   #On refait le stup pour que chaque Job marche sur sa propre machine isolée
