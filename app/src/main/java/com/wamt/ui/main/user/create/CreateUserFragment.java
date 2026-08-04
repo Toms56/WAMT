@@ -22,7 +22,6 @@ public class CreateUserFragment extends Fragment {
 
     private FragmentCreateUserBinding binding;
     private CreateUserViewModel createUserViewModel;
-    private UserViewModel userViewModel;
 
 
     public static CreateUserFragment newInstance() {
@@ -38,6 +37,7 @@ public class CreateUserFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        UserViewModel userViewModel;
         super.onViewCreated(view, savedInstanceState);
 
         createUserViewModel = new ViewModelProvider(this).get(CreateUserViewModel.class);
