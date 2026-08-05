@@ -25,7 +25,7 @@ SELECT * FROM user
     LiveData<List<UserEntity>> getAllUsers();
 
     @Upsert
-    void insertUser(UserEntity user);
+    void upsertUser(UserEntity user);
 
     @Delete
     void deleteUser(UserEntity user);

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import com.wamt.data.dao.IUserDao;
-import com.wamt.data.entity.UserEntity;
 import com.wamt.data.model.User;
 import com.wamt.mapper.UserMapper;
 
@@ -33,8 +32,8 @@ public class UserRepository {
         return Transformations.map(userDao.getAllUsers(), UserMapper::toDomainList);
     }
 
-    public void insertUser(User user) {
-        executorService.execute(() -> userDao.insertUser(UserMapper.toEntity(user)));
+    public void upsertUser(User user) {
+        executorService.execute(() -> userDao.upsertUser(UserMapper.toEntity(user)));
     }
 
     public void deleteUser(User user) {

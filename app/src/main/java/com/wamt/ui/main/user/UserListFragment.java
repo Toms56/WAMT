@@ -17,6 +17,7 @@ import com.wamt.R;
 import com.wamt.data.model.User;
 import com.wamt.databinding.FragmentMainPageBinding;
 import com.wamt.ui.main.user.create.CreateUserFragment;
+import com.wamt.ui.main.user.update.UpdateUserFragment;
 
 import java.util.List;
 
@@ -62,7 +63,14 @@ public class UserListFragment extends Fragment {
         // CreateUserFragment, pour que les deux fragments partagent le même UserViewModel
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        userAdapter = new UserAdapter(); //Sera rempli au fur et a mesure que Room donnera des users à afficher
+        // Création de l'adapter, en lui passant une lambda qui implémente
+        // l'interface OnUserEditListener (méthode onEditUser(User user))
+        // -> cette lambda sera exécutée à chaque clic sur le crayon d'un item
+        userAdapter = new UserAdapter(user-> requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_main_page, UpdateUserFragment.newInstance(user.getId()))
+                .addToBackStack(null)
+                .commit()); //Sera rempli au fur et a mesure que Room donnera des users à afficher
         binding.userPseudoRecyclerView.setLayoutManager(layoutManager);
         binding.userPseudoRecyclerView.setAdapter(userAdapter); //Association de l'adapter au RecyclerView
 

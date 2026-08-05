@@ -3,7 +3,9 @@
 
     <string name="wamt">WAMT</string>
     <string name="create_user">Créer un utilisateur</string>
+    <string name="update_user">Mettre à jour</string>
     <string name="profileName">Nom du profil</string>
+    <string name="update_user_title">Choisissez votre nouveau pseudo</string>
     <string name="enter_your_name">Entrez votre pseudo</string>
     <string name="close">Fermer</string>
 </resources>

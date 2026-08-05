@@ -3,7 +3,6 @@ package com.wamt.ui.main.user.create;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,6 @@ public class CreateUserFragment extends Fragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -64,8 +62,8 @@ public class CreateUserFragment extends Fragment {
         });
 
         binding.createUserButton.setOnClickListener(v -> {
-            String pseudo = binding.usernameEditText.getText().toString();
-            userViewModel.insertUser(new User(0, pseudo)); //Convention Room, l'id est généré automatiquement, donc on peut mettre 0 ou null
+            String pseudo = binding.usernameEditText.getText().toString().trim();
+            userViewModel.upsertUser(new User(0, pseudo)); //Convention Room, l'id est généré automatiquement, donc on peut mettre 0 ou null
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 

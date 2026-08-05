@@ -39,8 +39,8 @@ public class UserViewModel extends ViewModel {
         return userRepository.getUserById(id);
     }
 
-    public void insertUser(User user) {
-        userRepository.insertUser(user);
+    public void upsertUser(User user) {
+        userRepository.upsertUser(user);
     }
 
     public LiveData<Integer> getUserCount() {
