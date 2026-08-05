@@ -51,7 +51,7 @@ public class UserDaoTest {
         UserEntity user = new UserEntity(TEST_PSEUDO);
 
         // When
-        database.userDao().insertUser(user);
+        database.userDao().upsertUser(user);
 
         // Then
         UserEntity insertedUser =
@@ -63,10 +63,28 @@ public class UserDaoTest {
     }
 
     @Test
+    public void testShouldUpdateUserInDatabaseSuccessfully() throws InterruptedException{
+        //Given
+        UserEntity user = new UserEntity(TEST_PSEUDO);
+        database.userDao().upsertUser(user);
+
+        //When
+        UserEntity updatedUser =
+                LiveDataTestUtil.getOrAwaitValue(
+                        database.userDao().getUserById(1)
+                );
+        updatedUser.setPseudo("Test2");
+        database.userDao().upsertUser(updatedUser);
+
+        //Then
+        assertEquals("Test2", updatedUser.getPseudo());
+    }
+
+    @Test
     public void testShouldReturnOneWhenExistingOneUserInDatabase() throws InterruptedException{
         // Given
         UserEntity user = new UserEntity(TEST_PSEUDO);
-        database.userDao().insertUser(user);
+        database.userDao().upsertUser(user);
 
         //When
         Integer userCount = LiveDataTestUtil.getOrAwaitValue(database.userDao().getUserCount());
@@ -95,7 +113,7 @@ public class UserDaoTest {
         users.add(user2);
 
         for (final UserEntity user : users){
-            database.userDao().insertUser(user);
+            database.userDao().upsertUser(user);
         }
 
         //When

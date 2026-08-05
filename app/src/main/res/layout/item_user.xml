@@ -27,6 +27,17 @@
 
     </androidx.cardview.widget.CardView>
 
+    <ImageButton
+        android:id="@+id/itemUserEditButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_circle_edit_button"
+        android:src="@drawable/baseline_edit_24"
+        android:scaleType="centerInside"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/itemUserAvatarCard"
+        app:layout_constraintEnd_toEndOf="@id/itemUserAvatarCard" />
+
     <TextView
         android:id="@+id/itemUserPseudo"
         android:layout_width="wrap_content"

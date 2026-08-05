@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,11 @@ import java.util.List;
  */
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    public interface OnUserEditListener {
+        void onEditUser(User user);
+    }
+
+    private final OnUserEditListener editListener;
 
     // Liste des utilisateurs à afficher
     private List<User> users = new ArrayList<>();
@@ -39,8 +45,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
      *
      * Le Fragment crée l'adapter au démarrage.
      */
-    public UserAdapter() {
-
+    public UserAdapter(OnUserEditListener editListener) {
+        this.editListener = editListener;
     }
 
 
@@ -103,10 +109,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         // Affiche le pseudo dans la ligne
         holder.pseudoTextView.setText(user.getPseudo());
 
+        holder.editButton.setOnClickListener(v -> {
+            if (editListener != null) {
+                editListener.onEditUser(user);
+            }
+        });
+
+
         // Force chaque item à occuper 1/3 de la largeur du RecyclerView
         ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
-        if (lp instanceof FlexboxLayoutManager.LayoutParams) {
-            FlexboxLayoutManager.LayoutParams flexParams = (FlexboxLayoutManager.LayoutParams) lp;
+        if (lp instanceof FlexboxLayoutManager.LayoutParams flexParams) {
             flexParams.setFlexBasisPercent(0.33f);
             holder.itemView.setLayoutParams(flexParams);
         }
@@ -129,19 +141,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
      */
     static class UserViewHolder extends RecyclerView.ViewHolder {
 
-
         TextView pseudoTextView;
-
+        ImageButton editButton;
 
         public UserViewHolder(@NonNull View itemView) {
 
             super(itemView);
 
-
             // Récupération du TextView dans item_user.xml
             pseudoTextView = itemView.findViewById(
                     R.id.itemUserPseudo
             );
+            editButton = itemView.findViewById(R.id.itemUserEditButton);
         }
     }
 }
