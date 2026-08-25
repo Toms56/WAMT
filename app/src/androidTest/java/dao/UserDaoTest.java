@@ -3,6 +3,8 @@ package dao;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 
+import static org.junit.Assert.assertNull;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
@@ -33,7 +35,7 @@ public class UserDaoTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
-    public void createDb(){
+    public void createDb() {
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
                         WamtDatabase.class)
                 .allowMainThreadQueries()
@@ -41,12 +43,12 @@ public class UserDaoTest {
     }
 
     @After
-    public void closeDb(){
+    public void closeDb() {
         database.close();
     }
 
     @Test
-    public void testShouldInsertUserIntoDatabaseSuccessfully() throws InterruptedException{
+    public void testShouldInsertUserIntoDatabaseSuccessfully() throws InterruptedException {
         // Given
         UserEntity user = new UserEntity(TEST_PSEUDO);
 
@@ -63,7 +65,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void testShouldUpdateUserInDatabaseSuccessfully() throws InterruptedException{
+    public void testShouldUpdateUserInDatabaseSuccessfully() throws InterruptedException {
         //Given
         UserEntity user = new UserEntity(TEST_PSEUDO);
         database.userDao().upsertUser(user);
@@ -81,7 +83,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void testShouldReturnOneWhenExistingOneUserInDatabase() throws InterruptedException{
+    public void testShouldReturnOneWhenExistingOneUserInDatabase() throws InterruptedException {
         // Given
         UserEntity user = new UserEntity(TEST_PSEUDO);
         database.userDao().upsertUser(user);
@@ -112,7 +114,7 @@ public class UserDaoTest {
         users.add(user1);
         users.add(user2);
 
-        for (final UserEntity user : users){
+        for (final UserEntity user : users) {
             database.userDao().upsertUser(user);
         }
 
@@ -120,8 +122,28 @@ public class UserDaoTest {
         final List<UserEntity> retrievedUsers = LiveDataTestUtil.getOrAwaitValue(database.userDao().getAllUsers());
 
         // Then
-        assertEquals("Insert and retrieve list must have the same size",users.size(), retrievedUsers.size());
+        assertEquals("Insert and retrieve list must have the same size", users.size(), retrievedUsers.size());
     }
 
 
+    @Test
+    public void testShouldDeleteUserFromDatabaseSuccessfully() throws InterruptedException {
+        //Given
+        UserEntity user = new UserEntity(TEST_PSEUDO);
+        database.userDao().upsertUser(user);
+
+        //When
+        UserEntity insertedUser =
+                LiveDataTestUtil.getOrAwaitValue(
+                        database.userDao().getUserById(1)
+                );
+        database.userDao().deleteUser(insertedUser);
+
+        // Then
+        UserEntity deletedUser =
+                LiveDataTestUtil.getOrAwaitValue(
+                        database.userDao().getUserById(1)
+                );
+        assertNull("Deleted user must be null", deletedUser);
+        }
 }
