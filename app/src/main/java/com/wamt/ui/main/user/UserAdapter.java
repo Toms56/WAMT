@@ -1,5 +1,6 @@
 package com.wamt.ui.main.user;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,10 @@ import java.util.List;
 
 /**
  * L'Adapter fait le lien entre :
- *
+ * <p>
  * - La liste d'utilisateurs venant de Room
  * - Les éléments graphiques affichés dans le RecyclerView
- *
+ * <p>
  * Objectifs :
  * 1. Créer une ligne d'affichage (ViewHolder)
  * 2. Remplir cette ligne avec les données d'un utilisateur
@@ -34,28 +35,51 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         void onEditUser(User user);
     }
 
+    // Callback appelé quand on clique sur le bouton de suppression
+    public interface OnUserDeleteListener {
+        void onDeleteUser(User user);
+    }
     private final OnUserEditListener editListener;
+    private final OnUserDeleteListener deleteListener;
 
     // Liste des utilisateurs à afficher
     private List<User> users = new ArrayList<>();
 
+    private boolean deleteMode = false;
 
     /**
      * Constructeur vide.
-     *
+     * <p>
      * Le Fragment crée l'adapter au démarrage.
      */
-    public UserAdapter(OnUserEditListener editListener) {
+    public UserAdapter(OnUserEditListener editListener, OnUserDeleteListener deleteListener) {
         this.editListener = editListener;
+        this.deleteListener = deleteListener;
+    }
+
+    public boolean hasUsers(){
+        return !users.isEmpty();
+    }
+
+    //Activation/Desactivation du mode suppression
+    @SuppressLint("NotifyDataSetChanged")
+    public void setDeleteMode(boolean deleteMode) {
+        this.deleteMode = deleteMode;
+        notifyDataSetChanged();
+    }
+
+    public void toogleDeleteMode(){
+        setDeleteMode(!deleteMode);
     }
 
 
     /**
      * Reçoit la nouvelle liste depuis le Fragment.
-     *
+     * <p>
      * Exemple :
      * [Alice, Bob, Charlie]
      */
+    @SuppressLint("NotifyDataSetChanged")
     public void setUsers(List<User> users) {
 
         this.users = users;
@@ -67,7 +91,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     /**
      * Crée une nouvelle ligne.
-     *
+     * <p>
      * Ici on charge item_user.xml.
      */
     @NonNull
@@ -91,7 +115,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     /**
      * Remplit une ligne avec les données d'un utilisateur.
-     *
+     * <p>
      * position correspond à l'utilisateur dans la liste.
      */
     @Override
@@ -109,9 +133,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         // Affiche le pseudo dans la ligne
         holder.pseudoTextView.setText(user.getPseudo());
 
+        if (deleteMode) {
+            holder.editButton.setVisibility(View.GONE);
+            holder.deleteButton.setVisibility(View.VISIBLE);
+        } else {
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(View.GONE);
+        }
+
+
+        //Ouverture de la modification
         holder.editButton.setOnClickListener(v -> {
             if (editListener != null) {
                 editListener.onEditUser(user);
+            }
+        });
+
+        holder.deleteButton.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onDeleteUser(user);
             }
         });
 
@@ -143,6 +183,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         TextView pseudoTextView;
         ImageButton editButton;
+        ImageButton deleteButton;
 
         public UserViewHolder(@NonNull View itemView) {
 
@@ -153,6 +194,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                     R.id.itemUserPseudo
             );
             editButton = itemView.findViewById(R.id.itemUserEditButton);
+            deleteButton = itemView.findViewById(R.id.itemUserDeleteButton);
         }
     }
 }

@@ -1,10 +1,12 @@
 package com.wamt.ui.main.user;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,6 +20,7 @@ import com.wamt.data.model.User;
 import com.wamt.databinding.FragmentMainPageBinding;
 import com.wamt.ui.main.user.create.CreateUserFragment;
 import com.wamt.ui.main.user.update.UpdateUserFragment;
+import android.app.AlertDialog;
 
 import java.util.List;
 
@@ -42,14 +45,14 @@ public class UserListFragment extends Fragment {
     /**
      * Liaison entre la classe Java et le fichier xml*/
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentMainPageBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(requireContext());
@@ -63,14 +66,24 @@ public class UserListFragment extends Fragment {
         // CreateUserFragment, pour que les deux fragments partagent le même UserViewModel
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // Création de l'adapter, en lui passant une lambda qui implémente
-        // l'interface OnUserEditListener (méthode onEditUser(User user))
-        // -> cette lambda sera exécutée à chaque clic sur le crayon d'un item
-        userAdapter = new UserAdapter(user-> requireActivity().getSupportFragmentManager()
+        // Création de l'adapter, en lui passant deux actions :
+        // edition ou suppression d'un utilisateur
+        userAdapter = new UserAdapter(
+                //Clic sur le crayon d'un item : ecran de modification
+                user-> requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_main_page, UpdateUserFragment.newInstance(user.getId()))
                 .addToBackStack(null)
-                .commit()); //Sera rempli au fur et a mesure que Room donnera des users à afficher
+                .commit(),
+
+                //Definition de comportement stockée dans UserAdapter au moment du click
+                //Implémentation de l'interface OnUserDeleteListener de l'Adapter
+                //user --> Objet User attendu,
+                //userViewModel.deleteUser(user) sera executé
+                //setDeleteMode sera executé pour masquer le bouton de suppression
+
+                this::showDeleteConfirmationDialog
+        );
         binding.userPseudoRecyclerView.setLayoutManager(layoutManager);
         binding.userPseudoRecyclerView.setAdapter(userAdapter); //Association de l'adapter au RecyclerView
 
@@ -80,19 +93,63 @@ public class UserListFragment extends Fragment {
                 .addToBackStack(null) //Revenir sur le fragment précédent plutôt que fermer l'app
                 .commit());
 
+
+        //Activation du mode suppression si un utilisateur existe
+        binding.deleteUserTextView.setOnClickListener(v-> {
+            if(userAdapter != null && userAdapter.hasUsers()) {
+                userAdapter.toogleDeleteMode();
+            }
+        });
+
         userViewModel.getAllUsers().observe(getViewLifecycleOwner(), this::updateUi);
         userViewModel.getUserCount().observe(getViewLifecycleOwner(), this::updateCreateUserButtonState);
     }
 
     private void updateUi(List<User> users){
+
+        //Si la liste est vide, on masque ce qui concerne les utilisateurs
         if(users == null || users.isEmpty()){
             binding.userPseudoRecyclerView.setVisibility(View.GONE);
+
+            binding.deleteUserTextView.setVisibility(View.GONE);
+
+            if(userAdapter != null) {
+                userAdapter.setDeleteMode(false);
+            }
             return;
         }
 
         binding.userPseudoRecyclerView.setVisibility(View.VISIBLE);
+        binding.deleteUserTextView.setVisibility(View.VISIBLE);
         userAdapter.setUsers(users);
 
+    }
+
+    private void showDeleteConfirmationDialog(final User user) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Supprimer l'utilisateur");
+        builder.setMessage("Êtes-vous sûr ? Cette action est irréversible.");
+
+        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                userViewModel.deleteUser(user);
+
+                if (userAdapter != null) {
+                    userAdapter.setDeleteMode(false);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                userAdapter.setDeleteMode(false);
+            }
+        });
+
+        builder.show();
     }
 
     private void updateCreateUserButtonState(Integer userCount) {
