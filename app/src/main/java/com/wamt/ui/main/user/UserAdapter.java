@@ -52,7 +52,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     // Liste des utilisateurs à afficher
     private List<User> users = new ArrayList<>();
 
-    private boolean deleteMode = false;
+    protected boolean deleteMode = false;
 
     /**
      * Constructeur vide.

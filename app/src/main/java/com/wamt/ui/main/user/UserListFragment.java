@@ -36,6 +36,8 @@ public class UserListFragment extends Fragment {
 
     private UserAdapter userAdapter;
 
+    private boolean setAsDefaultUserOnNextSelection = false;
+
     public static UserListFragment newInstance() {
         return new UserListFragment();
     }
@@ -87,11 +89,18 @@ public class UserListFragment extends Fragment {
                 this::showDeleteConfirmationDialog,
 
                 //TODO Modifier selon la gestion des userPrefs
-                user-> requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_main_page, HomePageFragment.newInstance())
-                        .addToBackStack(null)
-                        .commit()
+                user->{
+                    if(setAsDefaultUserOnNextSelection){
+                        userViewModel.setDefaultUser(user.getId());
+                    }
+                    userViewModel.selectUser(user);
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_main_page, HomePageFragment.newInstance())
+                            .addToBackStack(null)
+                            .commit();
+                }
+
         );
         binding.userPseudoRecyclerView.setLayoutManager(layoutManager);
         binding.userPseudoRecyclerView.setAdapter(userAdapter); //Association de l'adapter au RecyclerView
@@ -107,10 +116,16 @@ public class UserListFragment extends Fragment {
         binding.deleteUserTextView.setOnClickListener(v-> {
             if(userAdapter != null && userAdapter.hasUsers()) {
                 userAdapter.toogleDeleteMode();
+                if(userAdapter.deleteMode){
+                    binding.deleteUserTextView.setText(getString(R.string.cancel_delete_user));
+                }else{
+                    binding.deleteUserTextView.setText(getString(R.string.delete_user));
+                }
             }
         });
 
         binding.setDefaultProfileCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            setAsDefaultUserOnNextSelection = isChecked;
             Log.d("UserListFragment", "Checkbox state changed: " + isChecked);
         });
 
@@ -147,7 +162,7 @@ public class UserListFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 userViewModel.deleteUser(user);
-
+                binding.deleteUserTextView.setText(getString(R.string.delete_user));
                 if (userAdapter != null) {
                     userAdapter.setDeleteMode(false);
                 }
@@ -158,6 +173,7 @@ public class UserListFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+                binding.deleteUserTextView.setText(getString(R.string.delete_user));
                 userAdapter.setDeleteMode(false);
             }
         });
