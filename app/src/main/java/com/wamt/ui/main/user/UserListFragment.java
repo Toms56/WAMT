@@ -19,6 +19,7 @@ import com.google.android.flexbox.JustifyContent;
 import com.wamt.R;
 import com.wamt.data.model.User;
 import com.wamt.databinding.FragmentMainPageBinding;
+import com.wamt.ui.home.HomePageFragment;
 import com.wamt.ui.main.user.create.CreateUserFragment;
 import com.wamt.ui.main.user.update.UpdateUserFragment;
 import android.app.AlertDialog;
@@ -83,7 +84,14 @@ public class UserListFragment extends Fragment {
                 //userViewModel.deleteUser(user) sera executé
                 //setDeleteMode sera executé pour masquer le bouton de suppression
 
-                this::showDeleteConfirmationDialog
+                this::showDeleteConfirmationDialog,
+
+                //TODO Modifier selon la gestion des userPrefs
+                user-> requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_main_page, HomePageFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit()
         );
         binding.userPseudoRecyclerView.setLayoutManager(layoutManager);
         binding.userPseudoRecyclerView.setAdapter(userAdapter); //Association de l'adapter au RecyclerView

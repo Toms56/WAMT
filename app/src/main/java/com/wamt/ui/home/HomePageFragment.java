@@ -14,12 +14,12 @@ import android.view.ViewGroup;
 
 import com.wamt.R;
 
-public class HomePage extends Fragment {
+public class HomePageFragment extends Fragment {
 
     private HomePageViewModel mViewModel;
 
-    public static HomePage newInstance() {
-        return new HomePage();
+    public static HomePageFragment newInstance() {
+        return new HomePageFragment();
     }
 
     @Override
