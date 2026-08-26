@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.flexbox.FlexboxLayoutManager;
@@ -39,22 +40,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public interface OnUserDeleteListener {
         void onDeleteUser(User user);
     }
+
+    public interface  OnUserProfileClickListener{
+        void onUserProfileClick(User user);
+    }
     private final OnUserEditListener editListener;
     private final OnUserDeleteListener deleteListener;
+    private final OnUserProfileClickListener profileClickListener;
+
 
     // Liste des utilisateurs à afficher
     private List<User> users = new ArrayList<>();
 
-    private boolean deleteMode = false;
+    protected boolean deleteMode = false;
 
     /**
      * Constructeur vide.
      * <p>
      * Le Fragment crée l'adapter au démarrage.
      */
-    public UserAdapter(OnUserEditListener editListener, OnUserDeleteListener deleteListener) {
+    public UserAdapter(OnUserEditListener editListener, OnUserDeleteListener deleteListener, OnUserProfileClickListener profileClickListener) {
         this.editListener = editListener;
         this.deleteListener = deleteListener;
+        this.profileClickListener = profileClickListener;
     }
 
     public boolean hasUsers(){
@@ -125,10 +133,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
 
         User user = users.get(position);
-        Log.d(
-                "ADAPTER",
-                "Affichage : " + user.getPseudo()
-        );
 
         // Affiche le pseudo dans la ligne
         holder.pseudoTextView.setText(user.getPseudo());
@@ -141,6 +145,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             holder.deleteButton.setVisibility(View.GONE);
         }
 
+        //Selection du profil
+        holder.avatarCard.setOnClickListener(v -> {
+            if (profileClickListener != null) {
+                profileClickListener.onUserProfileClick(user);
+                Log.d(
+                        "ADAPTER",
+                        "Profil sélectionné : " + user.getPseudo()
+                );
+            }
+        });
 
         //Ouverture de la modification
         holder.editButton.setOnClickListener(v -> {
@@ -184,6 +198,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         TextView pseudoTextView;
         ImageButton editButton;
         ImageButton deleteButton;
+        CardView avatarCard;
 
         public UserViewHolder(@NonNull View itemView) {
 
@@ -195,6 +210,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             );
             editButton = itemView.findViewById(R.id.itemUserEditButton);
             deleteButton = itemView.findViewById(R.id.itemUserDeleteButton);
+            avatarCard = itemView.findViewById(R.id.itemUserAvatarCard);
         }
     }
 }
