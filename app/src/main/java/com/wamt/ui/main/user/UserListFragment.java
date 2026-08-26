@@ -2,6 +2,7 @@ package com.wamt.ui.main.user;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,6 +100,10 @@ public class UserListFragment extends Fragment {
             if(userAdapter != null && userAdapter.hasUsers()) {
                 userAdapter.toogleDeleteMode();
             }
+        });
+
+        binding.setDefaultProfileCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Log.d("UserListFragment", "Checkbox state changed: " + isChecked);
         });
 
         userViewModel.getAllUsers().observe(getViewLifecycleOwner(), this::updateUi);

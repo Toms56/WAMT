@@ -9,4 +9,5 @@
     <string name="update_user_title">Choisissez votre nouveau pseudo</string>
     <string name="enter_your_name">Entrez votre pseudo</string>
     <string name="close">Fermer</string>
+    <string name="set_default_profile">Définir comme profil par défaut</string>
 </resources>
